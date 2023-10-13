@@ -22,7 +22,7 @@ class CustomUserManager(UserManager):
         user.save(using=self._db)
 
         return user
-    
+
 
     # Function to create a normal user
     def create_user(self, email=None, password=None, **extra_fields):
@@ -30,7 +30,7 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault('is_superuser', False)
 
         return self._create_user(email, password, **extra_fields)
-    
+
 
     # Function to create a super user
     def create_superuser(self, email=None, password=None, **extra_fields):
@@ -38,7 +38,7 @@ class CustomUserManager(UserManager):
         extra_fields.setdefault('is_superuser', True)
 
         return self._create_user(email, password, **extra_fields)
-    
+
 
 # Constructing the User Model
 class User(AbstractBaseUser, PermissionsMixin):
@@ -56,7 +56,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ]
     gender = models.CharField(max_length=1, blank=True, null=True,
                               choices=GENDER_CHOICES, verbose_name='Genero')
-    
+
     # Field to indicate a user of the system is a doctor (later)
     is_doctor = models.BooleanField(default=False, verbose_name='Es doctor?')
     # The doctor_id field will be a Foreign Key later
@@ -83,6 +83,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return f'{self.name} {self.last_name}'
-    
+
     def get_short_name(self):
         return self.name or self.email.split('@')[0]

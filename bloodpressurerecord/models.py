@@ -8,8 +8,7 @@ from django.utils import timezone
 class BloodPressureRecord(models.Model):
     user = models.ForeignKey(to="authuser.User",
                              on_delete=models.CASCADE)
-    
-    # https://www.merckmanuals.com/es-us/hogar/multimedia/table/clasificaci%C3%B3n-de-la-presi%C3%B3n-arterial-en-adultos
+
     BLOOD_PRESSURE_TYPE_CHOICES = [
         ('No', 'Normal'),               # Sis < 120; Dia < 80 mmHg
         ('El', 'Elevada'),              # 119>Sis<130; Dia < 80 mmHg
@@ -19,20 +18,20 @@ class BloodPressureRecord(models.Model):
     category = models.CharField(max_length=2, verbose_name='Categoria',
                                 choices=BLOOD_PRESSURE_TYPE_CHOICES,
                                 blank=True, null=True)
-    
+
     sistolic = models.PositiveSmallIntegerField(verbose_name='Presion Arterial Sistolica (mmHg)',
                                                 blank=False, null=False)
     diastolic = models.PositiveSmallIntegerField(verbose_name='Presion Arterial Diastolica (mmHg)',
                                                 blank=False, null=False)
-    
+
     # Heart Rate Limits: 60 > x < 190
     heart_rate = models.PositiveSmallIntegerField(verbose_name='Frecuencia Cardiaca (bpm)',
                                                   blank=True, null=True,
                                                   validators=[MaxValueValidator(500)])
-    
+
     comments = models.TextField(verbose_name='Comentarios', blank=True, null=True,
                                 editable=True)
-    
+
     creation_date = models.DateTimeField(default=timezone.now,
                                        verbose_name='Fecha de Creacion')
 
