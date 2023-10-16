@@ -40,6 +40,27 @@ class CustomUserManager(UserManager):
         return self._create_user(email, password, **extra_fields)
 
 
+# Constructing the Doctor model
+class Doctor(models.Model):
+    name = models.CharField(max_length=255, blank=True, default='',
+                            verbose_name='Nombre')
+    last_name = models.CharField(max_length=255, blank=True, default='',
+                                 verbose_name='Apellidos')
+    speciality = models.CharField(max_length=100, verbose_name='Especialidad',
+                                   blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Doctor'
+        verbose_name_plural = 'Doctors'
+    
+
+    def get_full_name(self):
+        return f'{self.name} {self.last_name}'
+
+    def get_short_name(self):
+        return self.name or self.email.split('@')[0]
+
+
 # Constructing the User Model
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(blank=True, default='', unique=True)
@@ -59,8 +80,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     # Field to indicate a user of the system is a doctor (later)
     is_doctor = models.BooleanField(default=False, verbose_name='Es doctor?')
-    # The doctor_id field will be a Foreign Key later
-    doctor_id = models.IntegerField(blank=True, null=True)
+
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, blank=True,
+                               null=True)
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

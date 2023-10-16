@@ -2,8 +2,6 @@ from django.db import models
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
-#from authuser.models import User
-
 # Create your models here.
 class BloodPressureRecord(models.Model):
     user = models.ForeignKey(to="authuser.User",
@@ -34,6 +32,14 @@ class BloodPressureRecord(models.Model):
 
     creation_date = models.DateTimeField(default=timezone.now,
                                        verbose_name='Fecha de Creacion')
+
+
+    def __str__(self):
+        date = self.creation_date.date()
+        information = f'{date.strftime("%d-%b-%Y")}: {self.sistolic} / {self.diastolic} mmHg'
+        if self.heart_rate:
+            information = information + ' - {self.heart_rate} bpm'
+        return information
 
 
     class Meta:

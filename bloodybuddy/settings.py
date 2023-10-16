@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'authuser', # Extends the Django's user auth model
-    'bloodpressurerecord' # Captures the User's Blood Pressure
+    'bloodpressurerecord', # Captures the User's Blood Pressure
+    'weightrecord', # Tracks the User's weight
+    'medicalnote', # Medical Notes between users and doctors
 ]
 
 
