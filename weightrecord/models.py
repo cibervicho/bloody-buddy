@@ -5,7 +5,7 @@ from django.utils import timezone
 # Create your models here.
 class Weight(models.Model):
     user = models.ForeignKey(to="authuser.User",
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE, related_name='pesos')
 
     weight = models.FloatField(verbose_name='Peso', blank=False, null=False)
 

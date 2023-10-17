@@ -5,7 +5,7 @@ from django.utils import timezone
 # Create your models here.
 class BloodPressureRecord(models.Model):
     user = models.ForeignKey(to="authuser.User",
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE, related_name='pressure_records')
 
     BLOOD_PRESSURE_TYPE_CHOICES = [
         ('No', 'Normal'),               # Sis < 120; Dia < 80 mmHg

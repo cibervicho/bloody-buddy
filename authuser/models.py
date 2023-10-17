@@ -82,7 +82,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_doctor = models.BooleanField(default=False, verbose_name='Es doctor?')
 
     doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, blank=True,
-                               null=True)
+                               null=True, related_name='patients')
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

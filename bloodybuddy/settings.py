@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework', # Django Rest-Framework
     'authuser', # Extends the Django's user auth model
     'bloodpressurerecord', # Captures the User's Blood Pressure
     'weightrecord', # Tracks the User's weight
