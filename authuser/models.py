@@ -55,7 +55,6 @@ class Doctor(models.Model):
     class Meta:
         verbose_name = 'Doctor'
         verbose_name_plural = 'Doctors'
-    
 
     def get_full_name(self):
         return f'{self.name} {self.last_name}'

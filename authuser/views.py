@@ -1,4 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import redirect
 from django.http import JsonResponse
 
 from rest_framework import status
@@ -7,7 +10,12 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 
 from authuser.models import User
-from authuser.serializers import PatientSerializer, PatientModelSerializer
+from authuser.serializers import (
+    UserSerializer,
+    ListUserModelSerializer,
+    PatientSerializer,
+    PatientModelSerializer,
+)
 
 # Create your views here.
 class LoginView(APIView):
@@ -17,10 +25,11 @@ class LoginView(APIView):
         password = request.data.get('password', None)
         user = authenticate(email=email, password=password)
 
-        if user:
+        if user is not None:
             login(request, user)
-            return Response(status=status.HTTP_200_OK)
-
+            return Response(UserSerializer(user).data,
+                            status=status.HTTP_200_OK)
+            
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -32,7 +41,36 @@ class LogoutView(APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-def pacientes(request):
+class ListUsersView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+        
+        users = User.objects.all()
+        serialized_users = ListUserModelSerializer(users, many=True).data
+
+        return Response(serialized_users, status=status.HTTP_200_OK)
+
+
+class PatientsView(APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+
+        patients = User.objects.all()
+        #serialized_patients = PatientModelSerializer(patients, many=True)
+        serialized_patients = PatientSerializer(patients, many=True)
+
+        return Response(serialized_patients.data)
+
+
+
+
+
+
+#################################
+@login_required
+def v1_pacientes(request):
     pacientes = User.objects.all()
 
     resultado = []
@@ -55,14 +93,3 @@ def pacientes(request):
     )
 
 
-@api_view(['GET', 'POST'])
-def v2_pacientes(request):
-    if request.method == 'GET':
-        patients = User.objects.all()
-        serialized_patients = PatientModelSerializer(patients, many=True)
-
-        return Response(serialized_patients.data)
-
-    else:
-        serialized_patients = PatientSerializer(request.data)
-        print(serialized_patients)

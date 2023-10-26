@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 
 AUTH_USER_MODEL = 'authuser.User'
+LOGIN_URL = 'auth/login'
 
 
 MIDDLEWARE = [
