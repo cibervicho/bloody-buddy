@@ -62,6 +62,12 @@ class PatientsView(APIView):
         serialized_patients = PatientSerializer(patients, many=True)
 
         return Response(serialized_patients.data)
+    
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+        
+        
 
 
 
