@@ -2,10 +2,16 @@ from django.db import models
 from django.core.validators import MaxValueValidator
 from django.utils import timezone
 
+from authuser.models import Profile
+
 # Create your models here.
 class BloodPressureRecord(models.Model):
-    user = models.ForeignKey(to="authuser.User",
-                             on_delete=models.CASCADE, related_name='pressure_records')
+    #user = models.ForeignKey(to="authuser.User",
+    #                         on_delete=models.CASCADE, related_name='pressure_records')
+    owner = models.ForeignKey(Profile, null=True, blank=True,
+                              related_name='pressure_records',
+                              on_delete=models.SET_NULL,
+                              verbose_name='Paciente')
 
     BLOOD_PRESSURE_TYPE_CHOICES = [
         ('No', 'Normal'),               # Sis < 120; Dia < 80 mmHg
@@ -36,7 +42,7 @@ class BloodPressureRecord(models.Model):
 
     def __str__(self):
         date = self.creation_date.date()
-        information = f'{date.strftime("%d-%b-%Y")}: {self.sistolic} / {self.diastolic} mmHg'
+        information = f'{date.strftime("%d-%b-%Y")}: {self.owner.user.get_full_name()} - {self.sistolic} / {self.diastolic} mmHg'
         if self.heart_rate:
             information = information + ' - {self.heart_rate} bpm'
         return information

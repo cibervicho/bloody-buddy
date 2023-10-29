@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django import forms
-from django.contrib.auth.models import Group
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
 
-from .models import User, Doctor
+from .models import User, Profile
 
 class UserCreationForm(forms.ModelForm):
     """A form for creating new users. Includes all the required
@@ -18,7 +17,6 @@ class UserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        #fields = ["email", "date_of_birth"]
         fields = ["email",]
 
     def clean_password2(self):
@@ -26,7 +24,7 @@ class UserCreationForm(forms.ModelForm):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
-            raise ValidationError("Los Passwords son distintos")
+            raise ValidationError("Los Passwords no coinciden")
         return password2
 
     def save(self, commit=True):
@@ -48,8 +46,8 @@ class UserChangeForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ["email", "password", "name", "last_name", "birth_date",
-                  "gender", "is_doctor", "is_active", "is_superuser", "is_staff"]
+        fields = ["email", "password", "name", "last_name",
+                  "is_active", "is_superuser", "is_staff"]
 
 
 class UserAdmin(BaseUserAdmin):
@@ -60,18 +58,15 @@ class UserAdmin(BaseUserAdmin):
     # The fields to be used in displaying the User model.
     # These override the definitions on the base UserAdmin
     # that reference specific fields on auth.User.
-    search_fields = ['email']
-    list_display = ['email', 'name', 'last_name']
-    ordering = ['email']
+    search_fields = ['last_name', 'email']
+    list_display = ['last_name', 'name', 'email']
+    ordering = ['last_name', 'name', 'email']
     filter_horizontal = ['groups', 'user_permissions']
     fieldsets = [
         (None, {'fields': ['email', 'password']}),
         ('Información Personal', {'fields': [
             'name',
-            'last_name',
-            'birth_date',
-            'gender',
-            'is_doctor'
+            'last_name'
         ]}),
         ('Permisos', {'fields': [
             'is_active',
@@ -87,8 +82,8 @@ class UserAdmin(BaseUserAdmin):
             None, 
             {
                 'classes': ['wide'],
-                'fields': ['email', 'name', 'last_name', 'birth_date',
-                           'gender', 'password1', 'password2'],
+                'fields': ['email', 'name', 'last_name',
+                           'password1', 'password2'],
             }
         ),
     ]
@@ -96,4 +91,17 @@ class UserAdmin(BaseUserAdmin):
 
 # Register your models here.
 admin.site.register(User, UserAdmin)
-admin.site.register(Doctor)
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['last_name', 'name', 'email']
+    search_fields = ['user__last_name', 'user__name', 'user__email']
+
+    def last_name(self, obj):
+        return obj.user.last_name
+    
+    def name(self, obj):
+        return obj.user.name
+    
+    def email(self, obj):
+        return obj.user.email
