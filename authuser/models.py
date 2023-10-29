@@ -1,4 +1,8 @@
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    UserManager
+)
 from django.db import models
 from django.utils import timezone
 
@@ -44,47 +48,39 @@ class CustomUserManager(UserManager):
 
 
 # Constructing the Doctor model
-class Doctor(models.Model):
-    name = models.CharField(max_length=255, blank=True, default='',
-                            verbose_name='Nombre')
-    last_name = models.CharField(max_length=255, blank=True, default='',
-                                 verbose_name='Apellidos')
-    speciality = models.CharField(max_length=100, verbose_name='Especialidad',
-                                   blank=True, null=True)
-
-    class Meta:
-        verbose_name = 'Doctor'
-        verbose_name_plural = 'Doctors'
-
-    def get_full_name(self):
-        return f'{self.name} {self.last_name}'
-
-    def get_short_name(self):
-        return self.name or self.email.split('@')[0]
+#class Doctor(models.Model):
+#    name = models.CharField(max_length=255, blank=True, default='',
+#                            verbose_name='Nombre')
+#    last_name = models.CharField(max_length=255, blank=True, default='',
+#                                 verbose_name='Apellidos')
+#    speciality = models.CharField(max_length=100, verbose_name='Especialidad',
+#                                   blank=True, null=True)
+#
+#    class Meta:
+#        verbose_name = 'Doctor'
+#        verbose_name_plural = 'Doctors'
+#
+#    def get_full_name(self):
+#        return f'{self.name} {self.last_name}'
+#
+#    def get_short_name(self):
+#        return self.name or self.email.split('@')[0]
 
 
 # Constructing the User Model
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(blank=True, default='', unique=True)
+    email = models.EmailField(max_length=500, blank=True, default='',
+                              unique=True)
     name = models.CharField(max_length=255, blank=True, default='',
                             verbose_name='Nombre')
     last_name = models.CharField(max_length=255, blank=True, default='',
                                  verbose_name='Apellidos')
-    birth_date = models.DateField(verbose_name='Fecha de Nacimiento',
-                                  blank=True, default=date(1900, 1, 1))
-    GENDER_CHOICES = [
-        ('M', 'Mujer'),
-        ('H', 'Hombre'),
-        ('O', 'Otro'),
-    ]
-    gender = models.CharField(max_length=1, blank=True, null=True,
-                              choices=GENDER_CHOICES, verbose_name='Genero')
 
     # Field to indicate a user of the system is a doctor (later)
-    is_doctor = models.BooleanField(default=False, verbose_name='Es doctor?')
+    #is_doctor = models.BooleanField(default=False, verbose_name='Es doctor?')
 
-    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, blank=True,
-                               null=True, related_name='patients')
+    #doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, blank=True,
+    #                           null=True, related_name='patients')
 
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -105,8 +101,44 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
+    def __str__(self):
+        return self.get_full_name()
+    
     def get_full_name(self):
-        return f'{self.name} {self.last_name}'
+        return f'{self.last_name}, {self.name}'
 
     def get_short_name(self):
         return self.name or self.email.split('@')[0]
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True,
+                                blank=True)
+    full_name = models.CharField(max_length=255, blank=True, null=True, 
+                            verbose_name='Nombre Completo')
+    birth_date = models.DateField(verbose_name='Fecha de Nacimiento',
+                                  blank=True, default=date(1900, 1, 1))
+    GENDER_CHOICES = [
+        ('M', 'Mujer'),
+        ('H', 'Hombre'),
+        ('O', 'Otro'),
+    ]
+    gender = models.CharField(max_length=1, blank=True, null=True,
+                              choices=GENDER_CHOICES, verbose_name='Genero')
+    USER_TYPE_CHOICES = [
+        ('A', 'Administrador'),
+        ('P', 'Paciente'),
+        ('M', 'Medico'),
+    ]
+    user_type = models.CharField(max_length=1, blank=True, null=True,
+                                 choices=USER_TYPE_CHOICES,
+                                 verbose_name='Tipo de Usuario')
+    creation_date = models.DateTimeField(default=timezone.now,
+                                         verbose_name='Fecha de Creacion')
+    
+    def __str__(self):
+        return f'{self.user.get_full_name()}'
+
+    class Meta:
+        verbose_name = 'Profile'
+        verbose_name_plural = 'Profiles'

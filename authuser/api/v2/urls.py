@@ -1,12 +1,11 @@
 # To be used with Django Rest-Framework
-from django.urls import path, include
+from django.urls import path
 
 from authuser.views import (
     LoginView,
     LogoutView,
     ListUsersView,
-    PatientsView,
-    #v2_pacientes
+    PatientsView
 )
 
 urlpatterns = [
