@@ -1,7 +1,43 @@
 # To be used with Django Rest-Framework
 from rest_framework import serializers
 
-from authuser.models import User
+from authuser.models import User, Profile
+from bloodpressurerecord.models import BloodPressureRecord
+from medicalnote.models import MedicalNote
+from weightrecord.models import Weight
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'
+
+
+class BloodPressureSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)
+    class Meta:
+        model = BloodPressureRecord
+        fields = '__all__'
+
+
+class MedicalNoteSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)
+    class Meta:
+        model = MedicalNote
+        fields = '__all__'
+
+
+class WeightSerializer(serializers.ModelSerializer):
+    owner = ProfileSerializer(many=False)
+    class Meta:
+        model = Weight
+        fields = '__all__'
+
+
+
+
+
+
 
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
@@ -31,14 +67,6 @@ class ListUserModelSerializer(serializers.ModelSerializer):
                   'is_doctor', 'is_active', 'date_joined', 'last_login')
 
 
-
-class PatientModelSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    class Meta:
-        model = User
-        fields = '__all__'
-
-
 class PatientSerializer(serializers.ModelSerializer):
     #https://stackoverflow.com/questions/43031323/how-to-create-a-new-user-with-django-rest-framework-and-custom-user-model
     id = serializers.IntegerField(read_only=True)
@@ -59,3 +87,9 @@ class PatientSerializer(serializers.ModelSerializer):
         user.set_password(validated_data['password'])
         user.save()
         return user
+
+class PatientModelSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    class Meta:
+        model = User
+        fields = '__all__'

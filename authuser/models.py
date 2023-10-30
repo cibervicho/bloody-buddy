@@ -136,9 +136,16 @@ class Profile(models.Model):
     creation_date = models.DateTimeField(default=timezone.now,
                                          verbose_name='Fecha de Creacion')
     
+    #weight_median = models.FloatField(default=0.0, null=True, blank=True)
+    
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
     class Meta:
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
+    
+
+    #@property
+    #def getMedianWeight(self):
+    #    pass
