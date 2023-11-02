@@ -15,8 +15,12 @@ from datetime import date
 
 # Overriding the UserManager with our own functionality
 class CustomUserManager(UserManager):
+    """Helps Django work with our custom user model."""
+
     # Help function to save a new into the DB
     def _create_user(self, email, password, **extra_fields):
+        """Helper function to create users in teh system."""
+
         if not email:
             raise ValueError("You have not provided a valid email address")
 
@@ -33,6 +37,8 @@ class CustomUserManager(UserManager):
 
     # Function to create a normal user
     def create_user(self, email=None, password=None, **extra_fields):
+        """Creates a new user profile object."""
+
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
 
@@ -41,6 +47,8 @@ class CustomUserManager(UserManager):
 
     # Function to create a super user
     def create_superuser(self, email=None, password=None, **extra_fields):
+        """Creates and saves a new superuser profile object."""
+
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -69,6 +77,8 @@ class CustomUserManager(UserManager):
 
 # Constructing the User Model
 class User(AbstractBaseUser, PermissionsMixin):
+    """Represents a 'user' object in the system."""
+
     email = models.EmailField(max_length=500, blank=True, default='',
                               unique=True)
     name = models.CharField(max_length=255, blank=True, default='',
@@ -95,19 +105,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['name']
 
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
 
     def __str__(self):
+        """How the 'user' object is shown to the world."""
+
         return self.get_full_name()
     
     def get_full_name(self):
+        """Used to get a users full name"""
+
         return f'{self.last_name}, {self.name}'
 
     def get_short_name(self):
+        """Used to get a users short name"""
+
         return self.name or self.email.split('@')[0]
 
 
