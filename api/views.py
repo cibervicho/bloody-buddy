@@ -1,14 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.shortcuts import redirect, get_object_or_404
-from django.http import JsonResponse, Http404
+from django.shortcuts import redirect
+from django.http import JsonResponse
 
 from rest_framework import status
-from rest_framework import generics #, mixins
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-# from rest_framework.decorators import api_view
 
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
