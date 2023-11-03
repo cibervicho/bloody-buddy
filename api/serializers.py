@@ -26,7 +26,8 @@ class BloodPressureSerializer(serializers.ModelSerializer):
     # owner = ProfileSerializer(many=False)
     class Meta:
         model = BloodPressureRecord
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('owner',)
 
 
 class ProfileSerializer(serializers.ModelSerializer):
