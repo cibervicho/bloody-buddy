@@ -2,23 +2,9 @@
 from rest_framework import serializers
 
 from authuser.models import User, Profile
-# from bloodpressurerecord.models import BloodPressureRecord
+from bloodpressurerecord.models import BloodPressureRecord
 # from medicalnote.models import MedicalNote
 # from weightrecord.models import Weight
-
-
-# class ProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = '__all__'
-
-
-# class BloodPressureSerializer(serializers.ModelSerializer):
-#     owner = ProfileSerializer(many=False)
-#     class Meta:
-#         model = BloodPressureRecord
-#         fields = '__all__'
-
 
 # class MedicalNoteSerializer(serializers.ModelSerializer):
 #     owner = ProfileSerializer(many=False)
@@ -36,40 +22,77 @@ from authuser.models import User, Profile
 
 
 
+class BloodPressureSerializer(serializers.ModelSerializer):
+    # owner = ProfileSerializer(many=False)
+    class Meta:
+        model = BloodPressureRecord
+        fields = '__all__'
 
+
+class ProfileSerializer(serializers.ModelSerializer):
+    pressure_records = BloodPressureSerializer(many=True)#, read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ('full_name', 'birth_date', 'gender', 'user_type', 'creation_date',
+                  'pressure_records')
+
+
+class UserCreateSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(required=True)
+    name = serializers.CharField(required=True)
+    last_name = serializers.CharField(required=True)
+    password = serializers.CharField(min_length=8, write_only=True)
+
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'name', 'last_name', 'password', 'profile',
+                  'is_active', 'is_superuser', 'is_staff', 'date_joined')
+        read_only_fields = ['id', 'profile']
+    
+    def create(self, validated_data):
+        user = User(
+            email=validated_data['email'],
+            name=validated_data['name'],
+            last_name=validated_data['last_name']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
     email = serializers.EmailField(required=True)
     name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=False)
     password = serializers.CharField(min_length=8, write_only=True)
 
+    profile = ProfileSerializer()
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'last_name', 'password', 'is_active',
-                  'is_superuser', 'is_staff', 'date_joined')
-
-
-
-# class PatientSerializer(serializers.ModelSerializer):
-#     #https://stackoverflow.com/questions/43031323/how-to-create-a-new-user-with-django-rest-framework-and-custom-user-model
-#     id = serializers.IntegerField(read_only=True)
-#     email = serializers.EmailField(required=True, allow_null=False)
-#     password = serializers.CharField(required=True, allow_null=False, write_only=True)
-#     name = serializers.CharField(required=True, allow_null=False)
-#     last_name = serializers.CharField(required=True, allow_null=False)
-#     birth_date = serializers.DateField()
-#     gender = serializers.CharField()
-#     is_doctor = serializers.BooleanField(required=True, allow_null=False)
-
-#     class Meta:
-#         model = User
-#         fields = ('id','email','password','name','last_name','birth_date','gender','is_doctor')
+        fields = ('id', 'email', 'name', 'last_name', 'password', 'profile',
+                  'is_active', 'is_superuser', 'is_staff',
+                  'date_joined')
+        read_only_fields = ['id', 'profile']
     
-#     def create(self, validated_data):
-#         user = super(PatientSerializer, self).create(validated_data)
-#         user.set_password(validated_data['password'])
-#         user.save()
-#         return user
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile')
+        profile = instance.profile
+
+        instance.email = validated_data.get('email', instance.email)
+        instance.name = validated_data.get('name', instance.name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        #instance.set_password(validated_data.get('password', instance.password))
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+        instance.is_superuser = validated_data.get('is_superuser', instance.is_superuser)
+        instance.is_staff = validated_data.get('is_staff', instance.is_staff)
+        instance.save()
+
+        profile.full_name = profile_data.get('full_name', profile.full_name)
+        profile.birth_date = profile_data.get('birth_date', profile.birth_date)
+        profile.gender = profile_data.get('gender', profile.gender)
+        profile.user_type = profile_data.get('user_type', profile.user_type)
+        profile.save()
+
+        return instance

@@ -15,12 +15,11 @@ from authuser.models import User, Profile
 # from weightrecord.models import Weight
 
 from api.serializers import (
-    # ProfileSerializer,
     # BloodPressureSerializer,
     # MedicalNoteSerializer,
     # WeightSerializer,
 
-    UserSerializer,
+    UserSerializer, UserCreateSerializer,
     # ListUserModelSerializer,
 )
 
@@ -33,20 +32,6 @@ from api.serializers import (
  ##   ##  ##        
   ## ##   ##        
    ###    ######### 
-
-### authuser.profile ###
-# @api_view(['GET'])
-# def getProfiles(request):
-#     profiles = Profile.objects.all()
-#     serializer = ProfileSerializer(profiles, many=True)
-#     return Response(serializer.data)
-
-# @api_view(['GET'])
-# def getProfile(request, pk):
-#     profile = get_object_or_404(Profile,pk=pk)
-#     serializer = ProfileSerializer(profile, many=False)
-#     return Response(serializer.data)
-
 
 
 ### bloodpressurerecord ###
@@ -147,12 +132,21 @@ class ListUsersView(APIView):
 
 
     def post(self, request):
-        """Creates a new user into the User and Profile models"""
+        """Creates a new user into the User and Profile models
+        
+        Example:
+        {
+            "email": "olivia@hotmail.com",
+            "name": "Olivia",
+            "last_name": "Rodrigo",
+            "password": "Per30rito"
+        }
+        """
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
-        
-        serializer = UserSerializer(data=request.data)
+
+        serializer = UserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -176,8 +170,22 @@ class DetailUsersView(APIView):
         return Response(serialized_user, status=status.HTTP_200_OK)
 
 
-    def put(self, request, pk):
-        """Updates a single user object"""
+    def patch(self, request, pk):
+        """Updates a single user object
+        
+        Example1:
+        {
+            "profile": {
+                "gender": "M"
+            }
+        }
+
+        Example2:
+        {
+            "email": "test2@outlook.com",
+            "profile": {}
+        }
+        """
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
@@ -186,8 +194,8 @@ class DetailUsersView(APIView):
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        serialized_user = UserSerializer(user, data=request.data)
+
+        serialized_user = UserSerializer(user, data=request.data, partial=True)
         if serialized_user.is_valid():
             serialized_user.save()
             return Response(serialized_user.data, status=status.HTTP_200_OK)
@@ -196,18 +204,20 @@ class DetailUsersView(APIView):
 
 
     def delete(self, request, pk):
-        """Deletes the selected user object"""
+        """Deletes a single user object"""
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
-        
+
         try:
-            user = User.objects.get(pk=pk)
-        except User.DoesNotExist:
+            # Since we have a signal that takes care of the automatic deletion
+            # of the User, we just delete the Profile.
+            user = Profile.objects.get(pk=pk)
+        except Profile.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({'message': 'Usuario eliminado satisfactoriamente'}, status=status.HTTP_204_NO_CONTENT)
 
 
 

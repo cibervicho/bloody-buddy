@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 
 from authuser.models import Profile
@@ -24,14 +24,22 @@ class BloodPressureRecord(models.Model):
                                 blank=True, null=True)
 
     sistolic = models.PositiveSmallIntegerField(verbose_name='Presion Arterial Sistolica (mmHg)',
-                                                blank=False, null=False)
+                                                blank=False, null=False,
+                                                validators=[
+                                                      MinValueValidator(50),
+                                                      MaxValueValidator(200)])
     diastolic = models.PositiveSmallIntegerField(verbose_name='Presion Arterial Diastolica (mmHg)',
-                                                blank=False, null=False)
+                                                blank=False, null=False,
+                                                validators=[
+                                                      MinValueValidator(10),
+                                                      MaxValueValidator(150)])
 
     # Heart Rate Limits: 60 > x < 190
     heart_rate = models.PositiveSmallIntegerField(verbose_name='Frecuencia Cardiaca (bpm)',
                                                   blank=True, null=True,
-                                                  validators=[MaxValueValidator(500)])
+                                                  validators=[
+                                                      MinValueValidator(50),
+                                                      MaxValueValidator(200)])
 
     comments = models.TextField(verbose_name='Comentarios', blank=True, null=True,
                                 editable=True)

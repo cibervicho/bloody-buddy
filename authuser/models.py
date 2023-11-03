@@ -129,7 +129,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True,
-                                blank=True)
+                                blank=True, related_name="profile")
     full_name = models.CharField(max_length=255, blank=True, null=True, 
                             verbose_name='Nombre Completo')
     birth_date = models.DateField(verbose_name='Fecha de Nacimiento',
