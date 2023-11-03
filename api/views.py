@@ -13,12 +13,12 @@ from rest_framework.views import APIView
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
 # from medicalnote.models import MedicalNote
-# from weightrecord.models import Weight
+from weightrecord.models import Weight
 
 from api.serializers import (
     BloodPressureSerializer,
     # MedicalNoteSerializer,
-    # WeightSerializer,
+    WeightSerializer,
 
     UserSerializer, UserCreateSerializer,
 )
@@ -45,7 +45,7 @@ class LoginView(APIView):
             login(request, user)
             return Response(UserSerializer(user).data,
                             status=status.HTTP_200_OK)
-            
+
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
@@ -59,6 +59,31 @@ class LogoutView(APIView):
 
 
 
+class WeightCreate(generics.CreateAPIView):
+    serializer_class = WeightSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs.get('pk')
+        owner = Profile.objects.get(pk=pk)
+
+        serializer.save(owner=owner)
+
+
+class WeightList(generics.ListAPIView):
+    serializer_class = WeightSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return Weight.objects.filter(owner=pk)
+
+
+class WeightDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Weight.objects.all()
+    serializer_class = WeightSerializer
+
+
+
+
 class BloodPressureCreate(generics.CreateAPIView):
     serializer_class = BloodPressureSerializer
 
@@ -67,7 +92,7 @@ class BloodPressureCreate(generics.CreateAPIView):
         owner = Profile.objects.get(pk=pk)
 
         serializer.save(owner=owner)
-    
+
 
 class BloodPressureList(generics.ListAPIView):
     serializer_class = BloodPressureSerializer
@@ -90,12 +115,12 @@ class ListUsersView(APIView):
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
-        
+
         try:
             users = User.objects.all()
         except User.DoesNotExist:
             return Response({'error': 'No users found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         serialized_users = UserSerializer(users, many=True).data
         return Response(serialized_users, status=status.HTTP_200_OK)
 
@@ -129,12 +154,12 @@ class DetailUsersView(APIView):
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
-        
+
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         serialized_user = UserSerializer(user, many=False).data
         return Response(serialized_user, status=status.HTTP_200_OK)
 
@@ -158,7 +183,7 @@ class DetailUsersView(APIView):
 
         if not request.user.is_authenticated:
             return redirect(f"{settings.LOGIN_URL}?next={request.path}")
-        
+
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -212,7 +237,7 @@ def v1_profiles(request):
             'gender': profile.gender,
         }
         result.append(p)
-    
+
     return JsonResponse(
         {
             'data': result,

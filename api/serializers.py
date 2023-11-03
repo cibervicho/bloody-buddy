@@ -4,26 +4,24 @@ from rest_framework import serializers
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
 # from medicalnote.models import MedicalNote
-# from weightrecord.models import Weight
+from weightrecord.models import Weight
 
 # class MedicalNoteSerializer(serializers.ModelSerializer):
-#     owner = ProfileSerializer(many=False)
+#     # owner = ProfileSerializer(many=False)
 #     class Meta:
 #         model = MedicalNote
 #         fields = '__all__'
+#         eclude = ('owner',)
 
 
-# class WeightSerializer(serializers.ModelSerializer):
-#     owner = ProfileSerializer(many=False)
-#     class Meta:
-#         model = Weight
-#         fields = '__all__'
-
-
+class WeightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Weight
+        fields = '__all__'
+        eclude = ('owner',)
 
 
 class BloodPressureSerializer(serializers.ModelSerializer):
-    # owner = ProfileSerializer(many=False)
     class Meta:
         model = BloodPressureRecord
         # fields = '__all__'
@@ -31,16 +29,19 @@ class BloodPressureSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    #pressure_records = BloodPressureSerializer(many=True)#, read_only=True)
     pressure_records_count = serializers.SerializerMethodField(read_only=True)
-    
+    weigth_records_count = serializers.SerializerMethodField(read_only=True)
+
     def get_pressure_records_count(self, owner):
         return owner.pressure_records.count()
+
+    def get_weigth_records_count(self, owner):
+        return owner.pesos.count()
 
     class Meta:
         model = Profile
         fields = ('full_name', 'birth_date', 'gender', 'user_type', 'creation_date',
-                  'pressure_records_count')
+                  'pressure_records_count', 'weigth_records_count')
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -54,7 +55,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'name', 'last_name', 'password', 'profile',
                   'is_active', 'is_superuser', 'is_staff', 'date_joined')
         read_only_fields = ['id', 'profile']
-    
+
     def create(self, validated_data):
         user = User(
             email=validated_data['email'],
@@ -80,7 +81,7 @@ class UserSerializer(serializers.ModelSerializer):
                   'is_active', 'is_superuser', 'is_staff',
                   'date_joined')
         read_only_fields = ['id', 'profile']
-    
+
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile')
         profile = instance.profile
