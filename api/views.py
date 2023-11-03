@@ -5,17 +5,18 @@ from django.shortcuts import redirect, get_object_or_404
 from django.http import JsonResponse, Http404
 
 from rest_framework import status
+from rest_framework import generics #, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 # from rest_framework.decorators import api_view
 
 from authuser.models import User, Profile
-# from bloodpressurerecord.models import BloodPressureRecord
+from bloodpressurerecord.models import BloodPressureRecord
 # from medicalnote.models import MedicalNote
 # from weightrecord.models import Weight
 
 from api.serializers import (
-    # BloodPressureSerializer,
+    BloodPressureSerializer,
     # MedicalNoteSerializer,
     # WeightSerializer,
 
@@ -32,64 +33,6 @@ from api.serializers import (
  ##   ##  ##        
   ## ##   ##        
    ###    ######### 
-
-
-### bloodpressurerecord ###
-# @api_view(['GET'])
-# def getBloodPressures(request):
-#     bprs = BloodPressureRecord.objects.all()
-#     serializer = BloodPressureSerializer(bprs, many=True)
-#     return Response(serializer.data)
-
-# @api_view(['GET'])
-# def getBloodPressure(request, pk):
-#     bpr = get_object_or_404(BloodPressureRecord,pk=pk)
-#     serializer = BloodPressureSerializer(bpr, many=False)
-#     return Response(serializer.data)
-
-
-
-### medicalnote ###
-# @api_view(['GET'])
-# def getMedicalNotes(request):
-#     medical_notes = MedicalNote.objects.all()
-#     serializer = MedicalNoteSerializer(medical_notes, many=True)
-#     return Response(serializer.data)
-
-# @api_view(['GET'])
-# def getMedicalNote(request, pk):
-#     medical_note = get_object_or_404(MedicalNote,pk=pk)
-#     serializer = MedicalNoteSerializer(medical_note, many=False)
-#     return Response(serializer.data)
-
-
-
-### weightrecord ###
-# @api_view(['GET','POST'])
-# def getWeights(request):
-#     weights = Weight.objects.all()
-#     serializer = WeightSerializer(weights, many=True)
-#     return Response(serializer.data)
-
-# @api_view(['GET'])
-# def getWeight(request, pk):
-#     weight = get_object_or_404(Weight, pk=pk)
-#     serializer = WeightSerializer(weight, many=False)
-#     return Response(serializer.data)
-
-# @api_view(['POST'])
-# def setWeight(request, pk):
-#     weight = get_object_or_404(Weight, pk=pk)
-#     user = request.user.profile
-#     data = request.data
-
-#     print('DATA:', data)
-
-#     serializer = WeightSerializer(weight, many=False)
-#     return Response(serializer.data)
-
-
-
 
 
 class LoginView(APIView):
@@ -113,6 +56,33 @@ class LogoutView(APIView):
         logout(request)
 
         return Response(status=status.HTTP_200_OK)
+
+
+
+
+class BloodPressureCreate(generics.CreateAPIView):
+    serializer_class = BloodPressureSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs.get('pk')
+        owner = Profile.objects.get(pk=pk)
+
+        serializer.save(owner=owner)
+    
+
+class BloodPressureList(generics.ListAPIView):
+    serializer_class = BloodPressureSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return BloodPressureRecord.objects.filter(owner=pk)
+
+
+class BloodPressureDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = BloodPressureRecord.objects.all()
+    serializer_class = BloodPressureSerializer
+
+
 
 
 class ListUsersView(APIView):
