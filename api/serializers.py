@@ -31,12 +31,16 @@ class BloodPressureSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    pressure_records = BloodPressureSerializer(many=True)#, read_only=True)
+    #pressure_records = BloodPressureSerializer(many=True)#, read_only=True)
+    pressure_records_count = serializers.SerializerMethodField(read_only=True)
+    
+    def get_pressure_records_count(self, owner):
+        return owner.pressure_records.count()
 
     class Meta:
         model = Profile
         fields = ('full_name', 'birth_date', 'gender', 'user_type', 'creation_date',
-                  'pressure_records')
+                  'pressure_records_count')
 
 
 class UserCreateSerializer(serializers.ModelSerializer):

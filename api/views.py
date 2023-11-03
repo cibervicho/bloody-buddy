@@ -21,7 +21,6 @@ from api.serializers import (
     # WeightSerializer,
 
     UserSerializer, UserCreateSerializer,
-    # ListUserModelSerializer,
 )
 
 # Create your views here.
