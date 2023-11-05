@@ -139,7 +139,6 @@ class NotesDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class UsersList(generics.ListAPIView):
     pagination_class = pagination.UserListPagination
-
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
