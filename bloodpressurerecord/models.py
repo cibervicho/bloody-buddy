@@ -50,9 +50,14 @@ class BloodPressureRecord(models.Model):
 
     def __str__(self):
         date = self.creation_date.date()
-        information = f'{date.strftime("%d-%b-%Y")}: {self.owner.user.get_full_name()} - {self.sistolic} / {self.diastolic} mmHg'
+
+        if hasattr(self.owner, 'user'):
+            information = f'{date.strftime("%d-%b-%Y")}: {self.owner.user.get_full_name()} - {self.sistolic} / {self.diastolic} mmHg'
+        else:
+            information = f'{date.strftime("%d-%b-%Y")}: USUARIO-ELIMINADO - {self.sistolic} / {self.diastolic} mmHg'
         if self.heart_rate:
-            information = information + ' - {self.heart_rate} bpm'
+            information = information + f' - {self.heart_rate} bpm'
+
         return information
 
 

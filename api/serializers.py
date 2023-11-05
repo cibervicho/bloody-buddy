@@ -12,6 +12,7 @@ from weightrecord.models import Weight
 #         model = MedicalNote
 #         fields = '__all__'
 #         eclude = ('owner',)
+#         read_only_fields = ['creation_date']
 
 
 class WeightSerializer(serializers.ModelSerializer):
@@ -19,6 +20,7 @@ class WeightSerializer(serializers.ModelSerializer):
         model = Weight
         fields = '__all__'
         eclude = ('owner',)
+        read_only_fields = ['creation_date']
 
 
 class BloodPressureSerializer(serializers.ModelSerializer):
@@ -26,6 +28,7 @@ class BloodPressureSerializer(serializers.ModelSerializer):
         model = BloodPressureRecord
         # fields = '__all__'
         exclude = ('owner',)
+        read_only_fields = ['creation_date']
 
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -42,19 +45,22 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = ('full_name', 'birth_date', 'gender', 'user_type', 'creation_date',
                   'pressure_records_count', 'weigth_records_count')
+        read_only_fields = ['full_name', 'creation_date']
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     name = serializers.CharField(required=True)
     last_name = serializers.CharField(required=True)
-    password = serializers.CharField(min_length=8, write_only=True)
+    password = serializers.CharField(min_length=8, write_only=True,
+                                     style={'input_type': 'password'})
 
     class Meta:
         model = User
         fields = ('id', 'email', 'name', 'last_name', 'password', 'profile',
                   'is_active', 'is_superuser', 'is_staff', 'date_joined')
-        read_only_fields = ['id', 'profile']
+        read_only_fields = ['id', 'profile', 'is_active', 'is_superuser',
+                            'is_staff', 'date_joined']
 
     def create(self, validated_data):
         user = User(
@@ -70,17 +76,17 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(required=True)
     name = serializers.CharField(required=True)
-    last_name = serializers.CharField(required=False)
-    password = serializers.CharField(min_length=8, write_only=True)
-
+    last_name = serializers.CharField(required=True)
+    date_joined = serializers.DateTimeField(read_only=True)
+    
     profile = ProfileSerializer()
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'name', 'last_name', 'password', 'profile',
+        fields = ('id', 'email', 'name', 'last_name', 'profile',
                   'is_active', 'is_superuser', 'is_staff',
                   'date_joined')
-        read_only_fields = ['id', 'profile']
+        read_only_fields = ['id']
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile')
@@ -89,13 +95,13 @@ class UserSerializer(serializers.ModelSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.name = validated_data.get('name', instance.name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        #instance.set_password(validated_data.get('password', instance.password))
         instance.is_active = validated_data.get('is_active', instance.is_active)
         instance.is_superuser = validated_data.get('is_superuser', instance.is_superuser)
         instance.is_staff = validated_data.get('is_staff', instance.is_staff)
         instance.save()
 
-        profile.full_name = profile_data.get('full_name', profile.full_name)
+        full_name = f"{validated_data.get('last_name', instance.last_name)} {validated_data.get('name', instance.name)}"
+        profile.full_name = full_name
         profile.birth_date = profile_data.get('birth_date', profile.birth_date)
         profile.gender = profile_data.get('gender', profile.gender)
         profile.user_type = profile_data.get('user_type', profile.user_type)

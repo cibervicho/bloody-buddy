@@ -20,7 +20,13 @@ class Weight(models.Model):
 
     def __str__(self):
         date = self.creation_date.date()
-        return f'{date.strftime("%d-%b-%Y")}: {self.owner.user.get_full_name()} - {self.weight} Kg'
+
+        if hasattr(self.owner, 'user'):
+            information = f'{date.strftime("%d-%b-%Y")}: {self.owner.user.get_full_name()} - {self.weight} Kg'
+        else:
+            information = f'{date.strftime("%d-%b-%Y")}: USUARIO-ELIMINADO - {self.weight} Kg'
+
+        return information
 
 
     class Meta:

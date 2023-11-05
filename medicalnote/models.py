@@ -22,7 +22,13 @@ class MedicalNote(models.Model):
 
     def __str__(self):
         date_tmp = self.creation_date.date()
-        return f'{date_tmp.strftime("%d-%b-%Y")}: Dr. X - Paciente: {self.owner.user.get_full_name()}'
+
+        if hasattr(self.owner, 'user'):
+            information = f'{date_tmp.strftime("%d-%b-%Y")}: Dr. X - Paciente: {self.owner.user.get_full_name()}'
+        else:
+            information = f'{date_tmp.strftime("%d-%b-%Y")}: Dr. X - Paciente: USUARIO-ELIMINADO'
+
+        return information
 
 
     class Meta:
