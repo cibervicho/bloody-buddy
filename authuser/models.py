@@ -110,6 +110,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'User'
         verbose_name_plural = 'Users'
+        ordering = ['id']
 
     def __str__(self):
         """How the 'user' object is shown to the world."""
@@ -151,17 +152,11 @@ class Profile(models.Model):
                                  verbose_name='Tipo de Usuario')
     creation_date = models.DateTimeField(default=timezone.now,
                                          verbose_name='Fecha de Creacion')
-    
-    #weight_median = models.FloatField(default=0.0, null=True, blank=True)
-    
+
+
     def __str__(self):
         return f'{self.user.get_full_name()}'
 
     class Meta:
         verbose_name = 'Profile'
         verbose_name_plural = 'Profiles'
-    
-
-    #@property
-    #def getMedianWeight(self):
-    #    pass

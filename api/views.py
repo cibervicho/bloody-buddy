@@ -139,7 +139,7 @@ class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response({'message': 'Usuario eliminado satisfactoriamente'}, status=status.HTTP_204_NO_CONTENT)
 
 
-
+## Leaving these here for reference.
 # class ListUsersView(APIView):
 #     def get(self, request):
 #         """Returns a list of users"""
