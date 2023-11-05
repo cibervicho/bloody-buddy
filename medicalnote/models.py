@@ -34,3 +34,4 @@ class MedicalNote(models.Model):
     class Meta:
         verbose_name = 'Medical Note'
         verbose_name_plural = 'Medical Notes'
+        ordering = ['id']

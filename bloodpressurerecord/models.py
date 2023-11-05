@@ -64,3 +64,4 @@ class BloodPressureRecord(models.Model):
     class Meta:
         verbose_name = 'Blood Pressure Record'
         verbose_name_plural = 'Blood Pressure Records'
+        ordering = ['id']

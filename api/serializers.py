@@ -3,16 +3,16 @@ from rest_framework import serializers
 
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
-# from medicalnote.models import MedicalNote
+from medicalnote.models import MedicalNote
 from weightrecord.models import Weight
 
-# class MedicalNoteSerializer(serializers.ModelSerializer):
-#     # owner = ProfileSerializer(many=False)
-#     class Meta:
-#         model = MedicalNote
-#         fields = '__all__'
-#         eclude = ('owner',)
-#         read_only_fields = ['creation_date']
+
+class MedicalNoteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MedicalNote
+        fields = '__all__'
+        eclude = ('owner',)
+        read_only_fields = ['creation_date']
 
 
 class WeightSerializer(serializers.ModelSerializer):
@@ -34,6 +34,7 @@ class BloodPressureSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     pressure_records_count = serializers.SerializerMethodField(read_only=True)
     weigth_records_count = serializers.SerializerMethodField(read_only=True)
+    medical_notes_count = serializers.SerializerMethodField(read_only=True)
 
     def get_pressure_records_count(self, owner):
         return owner.pressure_records.count()
@@ -41,10 +42,13 @@ class ProfileSerializer(serializers.ModelSerializer):
     def get_weigth_records_count(self, owner):
         return owner.pesos.count()
 
+    def get_medical_notes_count(self, owner):
+        return owner.notas_paciente.count()
+
     class Meta:
         model = Profile
         fields = ('full_name', 'birth_date', 'gender', 'user_type', 'creation_date',
-                  'pressure_records_count', 'weigth_records_count')
+                  'pressure_records_count', 'medical_notes_count', 'weigth_records_count')
         read_only_fields = ['full_name', 'creation_date']
 
 

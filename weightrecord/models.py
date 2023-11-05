@@ -32,3 +32,4 @@ class Weight(models.Model):
     class Meta:
         verbose_name = 'Weight Record'
         verbose_name_plural = 'Weight Records'
+        ordering = ['id']

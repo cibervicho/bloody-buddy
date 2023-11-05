@@ -11,12 +11,12 @@ from rest_framework.views import APIView
 
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
-# from medicalnote.models import MedicalNote
+from medicalnote.models import MedicalNote
 from weightrecord.models import Weight
 
 from api.serializers import (
     BloodPressureSerializer,
-    # MedicalNoteSerializer,
+    MedicalNoteSerializer,
     WeightSerializer,
 
     UserSerializer, UserCreateSerializer,
@@ -104,6 +104,31 @@ class BloodPressureList(generics.ListAPIView):
 class BloodPressureDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = BloodPressureRecord.objects.all()
     serializer_class = BloodPressureSerializer
+
+
+
+
+class NotesCreate(generics.CreateAPIView):
+    serializer_class = MedicalNoteSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs.get('pk')
+        owner = Profile.objects.get(pk=pk)
+
+        serializer.save(owner=owner)
+
+
+class NotesList(generics.ListAPIView):
+    serializer_class = MedicalNoteSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return MedicalNote.objects.filter(owner=pk)
+
+
+class NotesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = MedicalNote.objects.all()
+    serializer_class = MedicalNoteSerializer
 
 
 
