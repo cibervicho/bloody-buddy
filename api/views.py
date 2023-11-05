@@ -1,7 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.shortcuts import redirect
+#from django.shortcuts import redirect
 from django.http import JsonResponse
 
 from rest_framework import status
@@ -14,11 +14,12 @@ from bloodpressurerecord.models import BloodPressureRecord
 from medicalnote.models import MedicalNote
 from weightrecord.models import Weight
 
+from api import pagination
+
 from api.serializers import (
     BloodPressureSerializer,
     MedicalNoteSerializer,
     WeightSerializer,
-
     UserSerializer, UserCreateSerializer,
 )
 
@@ -69,6 +70,7 @@ class WeightCreate(generics.CreateAPIView):
 
 
 class WeightList(generics.ListAPIView):
+    pagination_class = pagination.WeightPagination
     serializer_class = WeightSerializer
 
     def get_queryset(self):
@@ -94,6 +96,7 @@ class BloodPressureCreate(generics.CreateAPIView):
 
 
 class BloodPressureList(generics.ListAPIView):
+    pagination_class = pagination.BloodPressurePagination
     serializer_class = BloodPressureSerializer
 
     def get_queryset(self):
@@ -119,6 +122,7 @@ class NotesCreate(generics.CreateAPIView):
 
 
 class NotesList(generics.ListAPIView):
+    pagination_class = pagination.NotesPagination
     serializer_class = MedicalNoteSerializer
 
     def get_queryset(self):
@@ -134,6 +138,8 @@ class NotesDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UsersList(generics.ListAPIView):
+    pagination_class = pagination.UserListPagination
+
     serializer_class = UserSerializer
     queryset = User.objects.all()
 
@@ -280,7 +286,7 @@ class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
   ## ##      ##   
    ###     ###### 
 
-@login_required
+#@login_required
 def v1_profiles(request):
     profiles = Profile.objects.all()
 
