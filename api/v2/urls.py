@@ -2,20 +2,20 @@
 from django.urls import path
 
 from api.views import (
-    LoginView, LogoutView,
     UsersList, UsersDetail, UsersCreate,
     BloodPressureList, BloodPressureDetail, BloodPressureCreate,
     NotesList, NotesCreate, NotesDetail,
     WeightList, WeightCreate, WeightDetail,
+    
     ## Leaving these here for reference.
+    #LoginView, LogoutView,
     #ListUsersView, DetailUsersView,
 )
 
 urlpatterns = [
-    path('auth/login', LoginView.as_view(), name='auth_login'),
-    path('auth/logout', LogoutView.as_view(), name='auth_logout'),
-    
     ## Leaving these here for reference.
+    # path('auth/login', LoginView.as_view(), name='auth_login'),
+    # path('auth/logout', LogoutView.as_view(), name='auth_logout'),
     # path('usuarios', ListUsersView.as_view(), name='list_users'),
     # path('usuarios/<int:pk>', DetailUsersView.as_view(), name='detail_users'),
 

@@ -34,31 +34,6 @@ from api.serializers import (
    ###    ######### 
 
 
-class LoginView(APIView):
-    def post(self, request):
-        # Recuperamos las credenciales y autenticamos al usuario
-        email = request.data.get('email', None)
-        password = request.data.get('password', None)
-        user = authenticate(email=email, password=password)
-
-        if user is not None:
-            login(request, user)
-            return Response(UserSerializer(user).data,
-                            status=status.HTTP_200_OK)
-
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-
-class LogoutView(APIView):
-    def post(self, request):
-        # Borramos la informacion de sesion
-        logout(request)
-
-        return Response(status=status.HTTP_200_OK)
-
-
-
-
 class WeightCreate(generics.CreateAPIView):
     serializer_class = WeightSerializer
 
@@ -170,6 +145,30 @@ class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 ## Leaving these here for reference.
+
+# class LoginView(APIView):
+#     def post(self, request):
+#         # Recuperamos las credenciales y autenticamos al usuario
+#         email = request.data.get('email', None)
+#         password = request.data.get('password', None)
+#         user = authenticate(email=email, password=password)
+
+#         if user is not None:
+#             login(request, user)
+#             return Response(UserSerializer(user).data,
+#                             status=status.HTTP_200_OK)
+
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+# class LogoutView(APIView):
+#     def post(self, request):
+#         # Borramos la informacion de sesion
+#         logout(request)
+
+#         return Response(status=status.HTTP_200_OK)
+
+
 # class ListUsersView(APIView):
 #     def get(self, request):
 #         """Returns a list of users"""

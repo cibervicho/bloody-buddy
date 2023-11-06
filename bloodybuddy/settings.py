@@ -136,6 +136,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    ## The DEFAULT_PERMISSION_CLASSES applies globaly to only allow authenticated
+    ## users to use the API.
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
+
+    ## This is default pagination class, which applies to every single view.
+    ## To use it, just uncomment it. However, right now there are class based
+    ## pagination that apply to each view.
     # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     # 'PAGE_SIZE': 5
 
