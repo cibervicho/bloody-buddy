@@ -10,16 +10,16 @@ from weightrecord.models import Weight
 class MedicalNoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = MedicalNote
-        fields = '__all__'
-        eclude = ('owner',)
+        #fields = '__all__'
+        exclude = ('owner',)
         read_only_fields = ['creation_date']
 
 
 class WeightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Weight
-        fields = '__all__'
-        eclude = ('owner',)
+        #fields = '__all__'
+        exclude = ('owner',)
         read_only_fields = ['creation_date']
 
 
