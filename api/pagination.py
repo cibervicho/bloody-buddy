@@ -7,7 +7,6 @@ class UserListPagination(PageNumberPagination):
     max_page_size = 10
     last_page_strings = ('last',)
 
-
 class WeightPagination(PageNumberPagination):
     page_size = 4
     page_query_param = 'page'

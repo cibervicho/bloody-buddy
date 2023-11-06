@@ -1,13 +1,15 @@
 from django.contrib.auth import authenticate, login, logout
-#from django.contrib.auth.decorators import login_required
 from django.conf import settings
-#from django.shortcuts import redirect
 from django.http import JsonResponse
+#from django.shortcuts import redirect
 
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAdminUser,
+)
 
 from authuser.models import User, Profile
 from bloodpressurerecord.models import BloodPressureRecord
@@ -120,10 +122,12 @@ class UsersList(generics.ListAPIView):
 
 class UsersCreate(generics.CreateAPIView):
     serializer_class = UserCreateSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]
 
 
 class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsAdminUser]
 
     def get_queryset(self):
         pk = self.kwargs['pk']
@@ -142,6 +146,8 @@ class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
 
         user.delete()
         return Response({'message': 'Usuario eliminado satisfactoriamente'}, status=status.HTTP_204_NO_CONTENT)
+
+
 
 
 ## Leaving these here for reference.
@@ -284,7 +290,6 @@ class UsersDetail(generics.RetrieveUpdateDestroyAPIView):
   ## ##      ##   
    ###     ###### 
 
-#@login_required
 def v1_profiles(request):
     profiles = Profile.objects.all()
 
